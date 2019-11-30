@@ -2,8 +2,23 @@ import { User } from './models/User';
 import { Post } from './models/Post';
 export const resolvers = {
   Query: {
-    getUsers: () => User.find(),
-    getUser: (_, { name }) => User.findOne({ name })
+    getAllUsers: () => User.find(),
+    getUser: (_, { name }) => User.findOne({ name }),
+    getAllPosts: async (_, { userId }) => {
+      try {
+        return await User.findById(userId).then(async user => {
+          if (user) {
+            return await Post.find({ userId: userId });
+          }
+        });
+      } catch (err) {
+        return {
+          code: 500,
+          message: 'something went wrong',
+          error: err.message
+        };
+      }
+    }
   },
   Mutation: {
     createUser: async (_, { name, number }) => {
@@ -13,9 +28,9 @@ export const resolvers = {
     },
     addPost: async (_, { title, description, userId }) => {
       try {
-        await User.findById(userId).then(async user => {
+        return await User.findById(userId).then(async user => {
           if (user) {
-            const post = new Post({ title, description, User: userId });
+            const post = new Post({ title, description, userId: userId });
             await post.save();
             return {
               code: 200,
