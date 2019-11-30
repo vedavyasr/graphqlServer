@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, ApolloError } from 'apollo-server-express';
 import express from 'express';
 import mongoose from 'mongoose';
 import { typeDefs } from './typeDefs';
